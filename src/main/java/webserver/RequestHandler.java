@@ -47,17 +47,25 @@ public class RequestHandler extends Thread {
             byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
             DataOutputStream dos = new DataOutputStream(out);
 //            byte[] body = "Hello World".getBytes();
-            response200Header(dos, body.length);
+            response200Header(dos, body.length, url.split("\\.")[1].toLowerCase());
             responseBody(dos, body);
         } catch (IOException e) {
             log.error(e.getMessage());
         }
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
+    private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String type) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            if ("html".equals(type)) {
+                dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            } else if ("css".equals(type)) {
+                dos.writeBytes("Content-Type: text/css;charset=utf-8\r\n");
+            } else if ("js".equals(type)) {
+                dos.writeBytes("Content-Type: text/javascript;charset=utf-8\r\n");
+            } else if (type.startsWith("woff")) {
+                dos.writeBytes("Content-Type: application/font-woff;charset=utf-8\r\n");
+            }
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
